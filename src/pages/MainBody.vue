@@ -181,7 +181,10 @@ export default {
 }
 .author {
   /* margin-bottom: 5px; */
+<<<<<<< HEAD
   width: 100%;
+=======
+>>>>>>> eec0c49fc2e4116d82156ce31bdb1ae116f7e8ef
   color: #ccc;
   font-size: small;
   text-align: left;

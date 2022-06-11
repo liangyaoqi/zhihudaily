@@ -3,6 +3,7 @@ import Vue from "vue";
 
 import MainBody from "../pages/MainBody";
 import ContentItem from "../pages/ContentItem";
+import CommentBody from "../pages/CommentBody";
 
 Vue.use(VueRouter);
 
@@ -19,9 +20,15 @@ const router = new VueRouter({
       },
     },
     {
-      name: "contentitem/:id",
+      name: "contentitem",
       path: "/mainbody/contentitem",
       component: ContentItem,
+      children: [],
+    },
+    {
+      name: "comment",
+      path: "/comment",
+      component: CommentBody,
     },
   ],
 });

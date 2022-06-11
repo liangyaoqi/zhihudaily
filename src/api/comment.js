@@ -1,21 +1,14 @@
 import request from "../utils/request";
 
 export default {
-  contentData() {
+  commentData(id) {
     return request({
-      url: `stories/latest`, //接口url
+      url: `story/${id}/short-comments`, //接口url
       method: "GET", //请求方式get/post
       /* data, //参数
       headers: {
         "Content-Type": "application/json",
       }, */
-    });
-  },
-  history(date) {
-    console.log(date);
-    return request({
-      url: `/stories/before/${date}`, //接口url
-      method: "GET", //请求方式get/post
     });
   },
 };

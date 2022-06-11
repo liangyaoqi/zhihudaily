@@ -1,24 +1,33 @@
 <template>
   <div class="item">
-<<<<<<< HEAD
-    <link rel="stylesheet" :href="itemContent.css" />
-    <div class="top">
-      <img :src="itemContent.image" width="100%" />
-      <section v-html="itemContent.body"></section>
-    </div>
-=======
     <link rel="stylesheet" :href="itemContent.css" type="text/css" />
-    <div class="top">
-      <img :src="itemContent.image" width="100%" />
-      <p class="topText">{{ itemContent.title }}</p>
+    <van-image class="top-img" cover width="100vw" :src="itemContent.image" />
+    <section class="body" v-html="itemContent.body"></section>
+
+    <!-- 底部导航栏 -->
+    <div class="footer">
+      <ul class="nav">
+        <li class="return" @click="back">
+          <van-icon size="25" name="arrow-left" />
+        </li>
+        <li class="line"></li>
+        <router-link
+          :to="{
+            path: '/comment',
+            query: {
+              id: this.$route.query.id,
+            },
+          }"
+        >
+          <li class="comment">
+            <van-icon size="25" name="comment-o" />
+          </li>
+        </router-link>
+        <li class="good"><van-icon size="25" name="good-job-o" /></li>
+        <li class="collection"><van-icon size="25" name="star-o" /></li>
+        <li class="share"><van-icon size="25" name="share-o" /></li>
+      </ul>
     </div>
-
-    <!-- 底部固定导航栏 -->
-    <div class="footer">footer</div>
-
-    <!-- 内容 -->
-    <section v-html="itemContent.body"></section>
->>>>>>> eec0c49fc2e4116d82156ce31bdb1ae116f7e8ef
   </div>
 </template>
 
@@ -36,6 +45,7 @@ export default {
   computed: {},
   created() {},
   mounted() {
+    console.log(this.itemContent);
     this.getItemData();
   },
   watch: {},
@@ -47,48 +57,56 @@ export default {
       console.log(itemData.data.story);
       this.itemContent = itemData.data.story;
     },
+    back() {
+      this.$router.go(-1);
+    },
   },
   components: {},
 };
 </script>
 
 <style scoped lang="css">
-.item {
-  height: 100px;
-  width: 100%;
-  background-color: #ccc;
-}
-<<<<<<< HEAD
-.headline .img-place-holder {
-  height: 0px !important;
-}
-=======
-
->>>>>>> eec0c49fc2e4116d82156ce31bdb1ae116f7e8ef
-.top {
-  height: 400px;
-  width: 100%;
-  position: absolute;
-}
-.top .topText {
-  position: relative;
-  left: 10px;
-<<<<<<< HEAD
-  bottom: 20px;
-=======
-  bottom: 60px;
-  color: #fff;
-  font-size: large;
-  margin: 0 20px;
+.body {
+  margin-top: -30vh;
 }
 /* 底部导航栏 */
 .footer {
-  z-index: 99;
-  width: 100%;
-  height: 30px;
-  background-color: #ccc;
+  position: fixed;
+  /* line-height: 7vh; */
+  top: 627px;
+  /* z-index: 999; */
+  background-color: #fff;
+  width: 100vw;
+  /* height: 7vh; */
+  height: 20px;
+}
+.nav {
   position: relative;
-  top: 100px;
->>>>>>> eec0c49fc2e4116d82156ce31bdb1ae116f7e8ef
+  top: -10px;
+  display: flex;
+}
+.return {
+  color: black;
+}
+.line {
+  margin-left: 15px;
+  border-left: 1px solid rgb(165, 158, 158);
+  color: black;
+}
+.comment {
+  margin-left: 20px;
+  color: black;
+}
+.good {
+  margin-left: 14vw;
+  color: black;
+}
+.collection {
+  margin-left: 14vw;
+  color: black;
+}
+.share {
+  margin-left: 14vw;
+  color: black;
 }
 </style>

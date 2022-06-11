@@ -1,52 +1,79 @@
 <template>
   <div>
     <!-- 顶部导航栏 -->
-
     <div class="topbar">
-      <ul>
+      <ul class="nav">
         <li class="date">
-          <h2>9</h2>
+          <p>10</p>
           六月
         </li>
         <li class="line"></li>
-        <li class="title"><h1>知乎日报</h1></li>
-        <li class="img"></li>
+        <li class="top-title"><h2>知乎日报</h2></li>
+        <li class="top-img"></li>
       </ul>
     </div>
 
-    <!-- 轮播图 -->
-    <div class="banner">
+    <!-- 主题内容 -->
+    <div class="body">
+      <!-- 轮播图 -->
       <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
-        <van-swipe-item v-for="item in banner.stories" :key="item.id"
-          ><img :src="item.images[0]" width="100%" height="100%" class="img" />
-          <!-- title标题 -->
-          <section class="bannertitle">{{ item.title }}</section>
-          <!-- 作者 -->
-          <section class="author">作者/{{ item.hint | capitalize }}</section>
+        <van-swipe-item v-for="item in banner.stories" :key="item.id">
+          <router-link
+            :to="{
+              path: '/mainbody/contentitem',
+              query: {
+                id: item.id,
+              },
+            }"
+          >
+            <van-image cover width="100vw" :src="item.images[0]" />
+            <p class="banner-font">{{ item.title }}</p>
+            <p class="banner-author">作者 / {{ item.hint | capitalize }}</p>
+          </router-link>
         </van-swipe-item>
       </van-swipe>
-    </div>
 
-    <!-- content 内容 -->
-    <div class="content" v-for="item in content.dataList" :key="item.id">
-      <router-link
-        :to="{
-          path: '/mainbody/contentitem',
-          query: {
-            id: item.id,
-          },
-        }"
-        class="link"
+      <!-- 内容 -->
+      <!-- vant的list组件 -->
+      <van-list
+        v-model="loading"
+        :finished="finished"
+        @load="onLoad"
+        offset="10"
+        :immediate-check="false"
+        :error.sync="error"
+        error-text="请求失败，点击重新加载"
       >
-        <div class="item">{{ item.title }}</div>
-        <div class="contentAuthor">{{ item.hint }}</div>
-        <img
-          class="contentImg"
-          :src="item.images[0]"
-          width="20%"
-          height="80%"
-        />
-      </router-link>
+        <!-- <van-cell
+            v-for="item in content.dataList"
+            :key="item.id"
+            :title="item.title"
+          /> -->
+        <div
+          class="content"
+          v-for="(item, index) in content.dataList"
+          :key="index"
+        >
+          <router-link
+            :to="{
+              path: '/mainbody/contentitem',
+              query: {
+                id: item.id,
+              },
+            }"
+            class="link"
+          >
+            <div class="contentTitle">{{ item.title }}</div>
+            <div class="contentAuthor">{{ item.hint }}</div>
+            <img
+              class="contentImg"
+              :src="item.images[0]"
+              width="25%"
+              height="80%"
+            />
+          </router-link>
+        </div>
+      </van-list>
     </div>
   </div>
 </template>
@@ -54,6 +81,7 @@
 <script>
 import bannerApi from "../api/banner";
 import contentApi from "../api/content";
+import dayjs from "dayjs";
 
 // import ContentItem from "../pages/ContentItem.vue";
 
@@ -62,6 +90,8 @@ export default {
   props: {},
   data() {
     return {
+      error: false,
+      current: 0,
       customIndex: 0,
       banner: {
         stories: [],
@@ -69,6 +99,12 @@ export default {
       content: {
         dataList: [],
       },
+      // list组件
+      loading: false,
+      finished: false,
+
+      //日期参数计算
+      count: 1,
     };
   },
   computed: {},
@@ -104,11 +140,35 @@ export default {
       let date = this.getNowFormatDate();
       let bannerData = await bannerApi.bannerData(date);
       this.banner.stories = bannerData.data.stories;
+      // console.log(bannerData.data.stories);
     },
     //获取内容信息
     async getContentData() {
       let contentData = await contentApi.contentData();
       this.content.dataList = contentData.data.stories;
+    },
+    bannerChange(index) {
+      console.log(index);
+    },
+
+    async loadMore() {
+      let date = dayjs().subtract(this.count, "day").format("YYYYMMDD");
+      let contentData = await contentApi.history(date);
+      console.log(contentData.data.stories);
+      this.content.dataList = this.content.dataList.concat(
+        contentData.data.stories
+      );
+
+      // 异步更新数据
+      // 加载状态结束
+      this.loading = false;
+
+      // 数据全部加载完成
+      // this.finished=true
+    },
+    onLoad() {
+      this.loadMore();
+      this.count += 1;
     },
   },
   components: {},
@@ -122,100 +182,129 @@ export default {
 </script>
 
 <style scoped lang="css">
+* {
+  margin: 0;
+  padding: 0;
+}
+li {
+  list-style: none;
+}
 .topbar {
+  /* display: none; */
+  width: 100vw;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+.nav {
+  text-align: center;
+  position: absolute;
+  display: flex;
+  width: 100vw;
+  height: 8vh;
   background-color: #fff;
 }
-.topbar ul {
-  display: flex;
-  width: 100%;
-  margin-top: 20px;
-  z-index: 10;
-
-  text-align: center;
-  position: absolute;
+.topbar .nav .date p {
+  font-size: large;
+  font-weight: 600;
 }
-.topbar ul li {
-  margin-left: 15px;
-}
-.topbar ul .line {
-  border-left: 1px solid #ccc;
-}
-.topbar ul .img {
-  width: 35px;
-  height: 35px;
-  background-color: #ccc;
-  border-radius: 50%;
-  position: relative;
-  left: 182px;
-}
-.topbar ul .date {
-  font-weight: 500;
-}
-
-/* banner轮播图 */
-.my-swipe .van-swipe-item {
-  height: 400px;
-  color: #fff;
-  font-size: 20px;
-  /* line-height: 150px; */
-  text-align: center;
-  background-color: #39a9ed;
-  margin-top: 68px;
-}
-.van-swipe-item {
-  color: #ccc;
-  font-size: small;
-}
-.my-swipe .van-swipe-item image {
-  width: 100%;
-  height: 100%;
-}
-.bannertitle {
-  height: 100px;
-  width: 100%;
-  position: absolute;
-  bottom: 0;
-  /* text-align: left; */
-  /* margin-left: 5px; */
-  backdrop-filter: blur(5px);
-}
-.author {
-  /* margin-bottom: 5px; */
-<<<<<<< HEAD
-  width: 100%;
-=======
->>>>>>> eec0c49fc2e4116d82156ce31bdb1ae116f7e8ef
-  color: #ccc;
-  font-size: small;
-  text-align: left;
+.topbar .nav .date {
+  margin-top: 10px;
   margin-left: 10px;
-  margin-bottom: 15px;
+  font-size: 5px;
+}
+.topbar .nav .line {
+  margin-left: 20px;
+  border-left: 2px solid #ccc;
+  height: 40px;
+  margin-top: 10px;
+}
+.topbar .nav .top-title h2 {
+  /* position: relative;
+        top: 5px; */
+  line-height: 8vh;
+  margin-left: 20px;
+}
+.topbar .nav .top-img {
+  margin-top: 8px;
+  margin-left: 47vw;
+  right: -270px;
+  background-color: #ccc;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+/* 主题内容 */
+.body {
+  width: 100vw;
+  /* height: 200vh; */
+  /* background-color: aqua; */
+}
+.body::-webkit-scrollbar {
+  display: none;
+}
+/* 轮播图 */
+.banner {
+  margin-top: 10vh;
+}
+.van-swipe {
+  /* margin-top: 10vh; */
+  height: 65vh;
+}
+.my-swipe .van-swipe-item {
+  margin-top: 8vh;
+}
+.banner-title {
+  height: 10vw;
+}
+.banner-font {
+  font-size: 20px;
+  font-weight: 600;
+  width: 80vw;
+  margin: 0 auto;
+  color: #fff;
   position: relative;
-  bottom: 45px;
-  left: 10px;
+  top: -100px;
+  height: 14vw;
+
+  /* //超出两行省略号 */
+  text-overflow: -o-ellipsis-lastline;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.banner-author {
+  position: relative;
+  top: -95px;
+  left: 35px;
+  color: #ccc;
+  font-size: 10px;
 }
 
+/* 内容 */
 /* 主页内容 */
 .content {
-  width: 100%;
+  width: 85vw;
   height: 100px;
   margin: 20px 15px;
 }
-.item {
-  width: 300px;
+.contentTitle {
+  width: 70vw;
   font-weight: 400;
   font-size: large;
   position: absolute;
-  margin-top: 15px;
 }
-
 .contentAuthor {
   position: relative;
   top: 70px;
 }
 .contentImg {
   position: relative;
-  left: 300px;
+  left: 70vw;
+  top: -2vh;
   border-radius: 5px;
 }
 </style>

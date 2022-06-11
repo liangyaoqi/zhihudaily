@@ -28,7 +28,6 @@ body {
   -webkit-overflow-scrolling: touch;
   font-size: 12px;
 }
-
 /* 清除默认样式 */
 body,
 div,
@@ -73,40 +72,33 @@ section {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
-
 a {
   color: #333;
   text-decoration: none;
 }
-
 em,
 i {
   font-style: normal;
 }
-
 ul,
 li,
 ol {
   list-style-type: none;
 }
-
 strong {
   font-weight: normal;
 }
-
 a,
 img {
   /*阻止长按页面，弹出菜单的方法*/
   -webkit-touch-callout: none;
 }
-
 input,
 textarea {
   -webkit-appearance: none;
   outline: none;
   border: none;
 }
-
 /* 设置HTML5元素为块 */
 article,
 aside,
@@ -121,7 +113,6 @@ nav,
 section {
   display: block;
 }
-
 /* 取消链接高亮  */
 body,
 div,
@@ -163,7 +154,6 @@ nav,
 section {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
-
 /* 移动端点击a链接出现蓝色背景问题解决 */
 a:link,
 a:active,
@@ -173,7 +163,6 @@ a:hover {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   -webkit-tap-highlight-color: transparent;
 }
-
 /* 禁止缩放表单 */
 input[type="submit"],
 input[type="reset"],

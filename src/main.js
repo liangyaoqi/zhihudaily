@@ -1,18 +1,24 @@
 import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
-<<<<<<< HEAD
-import { Swipe, SwipeItem, Sticky } from "vant";
+import {
+  Swipe,
+  SwipeItem,
+  Sticky,
+  Image as VanImage,
+  Icon,
+  List,
+  PullRefresh,
+  Cell,
+} from "vant";
 Vue.use(Swipe);
 Vue.use(SwipeItem);
 Vue.use(Sticky);
-=======
-import { Swipe, SwipeItem, Sticky, Icon } from "vant";
-Vue.use(Swipe);
-Vue.use(SwipeItem);
-Vue.use(Sticky);
+Vue.use(VanImage);
 Vue.use(Icon);
->>>>>>> eec0c49fc2e4116d82156ce31bdb1ae116f7e8ef
+Vue.use(List);
+Vue.use(PullRefresh);
+Vue.use(Cell);
 
 Vue.config.productionTip = false;
 

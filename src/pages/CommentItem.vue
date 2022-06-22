@@ -1,18 +1,30 @@
 <template>
   <div class="item">
+    <div class="holder"></div>
     <ul class="commentinside">
       <li class="img">
         <van-image round width="2rem" height="2rem" :src="item.avatar" />
       </li>
-      <li class="content">
-        <p class="author">{{ item.author }} <small class="more">···</small></p>
-        <p class="comment">{{ item.content }}</p>
-      </li>
-      <ul class="buttom">
-        <small class="date">{{ item.time }}</small>
-        <van-icon class="good" size="20" name="good-job-o" />
-        <van-icon class="comment" size="20" name="chat-o" />
-      </ul>
+      <div class="comment-right">
+        <li class="content">
+          <div class="box-name">
+            <p class="author">
+              {{ item.author }}
+            </p>
+            <small class="more">···</small>
+          </div>
+          <p class="comment">{{ item.content }}</p>
+        </li>
+        <ul class="buttom">
+          <van-badge :content="item.likes" color="#fff">
+            <small class="date">{{ item.time | converter }}</small>
+          </van-badge>
+          <div class="buttom-right">
+            <van-icon class="good" size="20" name="good-job-o" />
+            <van-icon class="comment" size="20" name="chat-o" />
+          </div>
+        </ul>
+      </div>
     </ul>
   </div>
 </template>
@@ -36,77 +48,71 @@ export default {
   computed: {},
   created() {},
   mounted() {
-    console.log(this.item);
+    // console.log(this.item);
   },
   watch: {},
   methods: {},
   components: {},
+  filters: {
+    converter(time) {
+      var date = new Date(time * 1000); //时间戳为10位需*1000，时间戳为13位的话不需乘1000
+      // var Y = date.getFullYear() + "-";
+      var M =
+        (date.getMonth() + 1 < 10
+          ? "0" + (date.getMonth() + 1)
+          : date.getMonth() + 1) + "-";
+      var D = date.getDate() + " ";
+      var h = date.getHours() + ":";
+      var m = date.getMinutes();
+      // var s = date.getSeconds();
+      // return Y + M + D + h + m + s;
+      return M + D + h + m;
+    },
+  },
 };
 </script>
 
-<style scoped lang="css">
+<style scoped lang="less">
 .item {
-  /* margin-top: 8vh; */
-  width: 100vw;
-  height: 17vh;
-  /* background-color: aqua; */
-  /* position: absolute; */
   border-bottom: 1px solid #ccc;
 }
-
-.item .img {
-  position: relative;
-  top: 10px;
-  left: 10px;
-}
 .commentinside {
+  margin-top: 15px;
   display: flex;
-  width: 80vw;
 }
-.buttom {
-  width: 3vh !important;
+.box-name {
+  display: flex;
+  justify-content: space-between;
+  width: 83vw;
 }
 .content {
-  margin-left: 6vw;
-  margin-top: 2vw;
-}
-.content .author {
-  font-weight: 600;
-  margin-bottom: 1vh;
+  margin-left: 10px;
 }
 .content .comment {
-  width: 80vw;
-  font-weight: 200;
+  font-size: 12px;
+  font-weight: 300;
 }
-.content .more {
-  color: #ccc;
-  position: relative;
-  left: 260px;
+.content .author {
+  margin-bottom: 5px;
+  font-weight: 500;
 }
-.content .buttom {
-  width: 80vw;
-  background-color: blueviolet;
-}
+/* 评论底部 */
 .buttom {
-  text-align: center;
+  margin-top: 15px;
+  margin-left: 8px;
   display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
   color: #ccc;
-  width: 80vh;
-  position: relative;
-  top: 80px;
-  left: -302px;
 }
-.buttom .date {
-  height: 3vh;
+.buttom-right .comment {
+  padding-left: 30px;
 }
-.buttom .good {
-  position: relative;
-  left: 160px;
-  height: 3vh;
-}
-.buttom .comment {
-  position: relative;
-  left: 195px;
-  height: 3vh;
+
+/* 点赞徽标样式 */
+/deep/ .van-badge--fixed {
+  color: #ccc;
+  left: 59vw;
+  top: 12px;
 }
 </style>

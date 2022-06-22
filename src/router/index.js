@@ -4,6 +4,9 @@ import Vue from "vue";
 import MainBody from "../pages/MainBody";
 import ContentItem from "../pages/ContentItem";
 import CommentBody from "../pages/CommentBody";
+import PersonalCenter from "../pages/PersonalCenter";
+import Collection from "../pages/Collection";
+import Message from "../pages/Message";
 
 Vue.use(VueRouter);
 
@@ -21,7 +24,7 @@ const router = new VueRouter({
     },
     {
       name: "contentitem",
-      path: "/mainbody/contentitem",
+      path: "/contentitem",
       component: ContentItem,
       children: [],
     },
@@ -29,6 +32,21 @@ const router = new VueRouter({
       name: "comment",
       path: "/comment",
       component: CommentBody,
+    },
+    {
+      name: "personal",
+      path: "/personal",
+      component: PersonalCenter,
+    },
+    {
+      name: "collection",
+      path: "/collection",
+      component: Collection,
+    },
+    {
+      name: "message",
+      path: "/message",
+      component: Message,
     },
   ],
 });

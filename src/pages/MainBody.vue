@@ -3,13 +3,30 @@
     <!-- 顶部导航栏 -->
     <div class="topbar">
       <ul class="nav">
-        <li class="date">
-          <p>10</p>
-          六月
+        <li class="date" @click="toTop">
+          <p>{{ this.date.slice(6) }}</p>
+          {{ this.date.slice(4, 6) | dateConverter }}月
         </li>
         <li class="line"></li>
-        <li class="top-title"><h2>知乎日报</h2></li>
-        <li class="top-img"></li>
+        <li class="top-title">
+          <h2
+            v-if="
+              (show =
+                hour < 10
+                  ? '早上好！'
+                  : hour < 18
+                  ? '好人有好报'
+                  : hour < 22
+                  ? '晚上好！'
+                  : '早点休息~')
+            "
+          >
+            {{ show }}
+          </h2>
+        </li>
+        <li class="top-img" @click="toCenter">
+          <img class="avtar" src="../assets/liuyifei.jpeg" alt="" />
+        </li>
       </ul>
     </div>
 
@@ -26,10 +43,18 @@
               },
             }"
           >
-            <van-image cover width="100vw" :src="item.images[0]" />
-            <p class="banner-font">{{ item.title }}</p>
-            <p class="banner-author">作者 / {{ item.hint | capitalize }}</p>
+            <van-image cover width="100vw" :src="item.image" />
+            <div class="banner-title">
+              <p class="banner-font">{{ item.title }}</p>
+              <p class="banner-author">{{ item.hint | capitalize }}</p>
+            </div>
           </router-link>
+          <div
+            class="banner-box"
+            :style="`background-image:linear-gradient(to bottom,transparent,#${item.image_hue.substr(
+              2
+            )},#${item.image_hue.substr(2)})`"
+          ></div>
         </van-swipe-item>
       </van-swipe>
 
@@ -56,22 +81,33 @@
         >
           <router-link
             :to="{
-              path: '/mainbody/contentitem',
+              path: '/contentitem',
               query: {
                 id: item.id,
               },
             }"
             class="link"
           >
-            <div class="contentTitle">{{ item.title }}</div>
-            <div class="contentAuthor">{{ item.hint }}</div>
-            <img
-              class="contentImg"
-              :src="item.images[0]"
-              width="25%"
-              height="80%"
-            />
+            <div class="box-content">
+              <div class="box-left">
+                <div class="contentTitle">{{ item.title }}</div>
+                <div class="contentAuthor">{{ item.hint }}</div>
+              </div>
+              <div class="box-right">
+                <van-image class="contentImg" :src="item.images[0]" />
+              </div>
+            </div>
           </router-link>
+          <!-- 消息线 -->
+          <van-divider
+            v-if="content.dataList.length > 6 && (index + 1) % 6 == 0"
+            content-position="left"
+            :style="{
+              color: '#b1acac',
+              padding: '0 -6px',
+            }"
+            >{{ lineDate | linefilter }}</van-divider
+          >
         </div>
       </van-list>
     </div>
@@ -90,11 +126,20 @@ export default {
   props: {},
   data() {
     return {
+      show: "",
+      //时间
+      hour: null,
+      //底线日期
+      lineDate: "",
+      lineCount: 1,
+      // 日期
+      date: "",
       error: false,
       current: 0,
       customIndex: 0,
       banner: {
         stories: [],
+        topStories: [],
       },
       content: {
         dataList: [],
@@ -108,39 +153,27 @@ export default {
     };
   },
   computed: {},
-  created() {},
+  created() {
+    // const date = new Date();
+    // const now = date.now();
+    this.hour = parseInt(dayjs(Date.now()).hour());
+  },
   mounted() {
     this.getBannerData();
     this.getContentData();
+    this.lineDate = dayjs().subtract(this.lineCount, "day").format("YYYYMMDD");
   },
   watch: {},
   methods: {
-    //获取当前日期年月日函数
-    getNowFormatDate() {
-      var date = new Date();
-      var seperator1 = ""; //分隔符
-      var year = date.getFullYear();
-      var month = date.getMonth() + 1;
-      var strDate = date.getDate();
-      if (month >= 1 && month <= 9) {
-        month = "0" + month;
-      }
-      if (strDate >= 0 && strDate <= 9) {
-        strDate = "0" + strDate;
-      }
-      var currentdate = year + seperator1 + month + seperator1 + strDate;
-      return currentdate;
-    },
-
     handleItemChange(index) {
       this.customIndex = index;
     },
     // 获取轮播图信息
     async getBannerData() {
-      let date = this.getNowFormatDate();
-      let bannerData = await bannerApi.bannerData(date);
-      this.banner.stories = bannerData.data.stories;
-      // console.log(bannerData.data.stories);
+      let bannerData = await bannerApi.bannerData();
+      this.banner.stories = bannerData.data.top_stories;
+      this.date = bannerData.data.date;
+      // console.log(bannerData.data);
     },
     //获取内容信息
     async getContentData() {
@@ -169,6 +202,19 @@ export default {
     onLoad() {
       this.loadMore();
       this.count += 1;
+
+      //更新底部线条的日期
+      this.lineDate = dayjs()
+        .subtract(this.lineCount, "day")
+        .format("YYYYMMDD");
+      this.lineCount += 1;
+      this.firstFlash = true;
+    },
+    toCenter() {
+      this.$router.push("/personal");
+    },
+    toTop() {
+      document.documentElement.scrollTop = 0;
     },
   },
   components: {},
@@ -177,11 +223,47 @@ export default {
       let val = value.split("·", 3);
       return val[0];
     },
+    dateConverter(value) {
+      switch (value.toString()) {
+        case "01":
+          return "一";
+        case "02":
+          return "二";
+        case "03":
+          return "三";
+        case "04":
+          return "四";
+        case "05":
+          return "五";
+        case "06":
+          return "六";
+        case "07":
+          return "七";
+        case "08":
+          return "八";
+        case "09":
+          return "九";
+        case "10":
+          return "十";
+        case "11":
+          return "十一";
+        case "12":
+          return "十二";
+      }
+    },
+    linefilter(value) {
+      if (value.slice(4, 5 > 0)) {
+        // 月份大于9月
+        return value.slice(4, 6) + "月" + value.slice(6, 9) + "日";
+      } else {
+        return value.slice(5, 6) + "月" + value.slice(6, 9) + "日";
+      }
+    },
   },
 };
 </script>
 
-<style scoped lang="css">
+<style scoped lang="less">
 * {
   margin: 0;
   padding: 0;
@@ -194,7 +276,15 @@ li {
   width: 100vw;
   position: sticky;
   top: 0;
-  z-index: 999;
+  z-index: 99;
+}
+.top-img {
+  overflow: hidden;
+  z-index: 10;
+}
+.avtar {
+  width: 11vw;
+  height: 14vw;
 }
 .nav {
   text-align: center;
@@ -239,6 +329,7 @@ li {
   width: 100vw;
   /* height: 200vh; */
   /* background-color: aqua; */
+  margin-top: 0vh;
 }
 .body::-webkit-scrollbar {
   display: none;
@@ -254,57 +345,99 @@ li {
 .my-swipe .van-swipe-item {
   margin-top: 8vh;
 }
-.banner-title {
-  height: 10vw;
+.banner-box {
+  position: relative;
+  top: -40vh;
+  width: 100vw;
+  height: 40vh;
 }
-.banner-font {
+.banner-title {
   font-size: 20px;
   font-weight: 600;
-  width: 80vw;
+  width: 100vw;
   margin: 0 auto;
   color: #fff;
   position: relative;
   top: -100px;
-  height: 14vw;
+  height: 26vw;
+  opacity: 0.8;
+  z-index: 10;
 
-  /* //超出两行省略号 */
-  text-overflow: -o-ellipsis-lastline;
+  /* //超出两行省略号
   overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;*/
+
+  // background-image: linear-gradient(to bottom, transparent, #4fa569);
+}
+.banner-font {
+  width: 80vw;
+  margin: 0 auto;
+  z-index: 10;
 }
 .banner-author {
-  position: relative;
-  top: -95px;
-  left: 35px;
+  width: 80vw;
+  margin: 0 auto;
   color: #ccc;
   font-size: 10px;
+  margin-top: 10px;
+  z-index: 10;
+}
+/deep/ .van-swipe__indicators {
+  left: auto;
+  right: 25px;
+  transform: none;
+  .van-swipe__indicator {
+    width: 4px;
+    height: 4px;
+  }
+  .van-swipe__indicator--active {
+    width: 18px;
+    border-radius: 3px;
+  }
 }
 
 /* 内容 */
 /* 主页内容 */
-.content {
-  width: 85vw;
-  height: 100px;
-  margin: 20px 15px;
-}
+// .content {
+//   /* width: 95vw;
+//   height: 100px; */
+//   /* margin: 20px 15px; */
+//   /* margin: 0 auto; */
+// }
 .contentTitle {
-  width: 70vw;
+  /* width: 70vw;
   font-weight: 400;
+  position: absolute; */
   font-size: large;
-  position: absolute;
+  width: 60vw;
+  // height: 5vh;
+
+  text-overflow: -o-ellipsis-lastline;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /*设置显示的行数*/
+  line-clamp: 2; /*设置显示的行数*/
+  -webkit-box-orient: vertical;
 }
-.contentAuthor {
-  position: relative;
-  top: 70px;
+.box-content {
+  width: 90vw;
+  margin: 15px auto;
+  display: flex;
+  justify-content: space-between;
 }
-.contentImg {
-  position: relative;
-  left: 70vw;
-  top: -2vh;
+.box-left {
+  margin-top: 10px;
+  margin-left: 5px;
+}
+.box-right {
+  overflow: hidden;
+  width: 20vw;
+  height: 20vw;
   border-radius: 5px;
+}
+.box-right .contentImg {
+  width: 20vw;
+  height: 20vw;
 }
 </style>

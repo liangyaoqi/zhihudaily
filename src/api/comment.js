@@ -11,6 +11,12 @@ export default {
       }, */
     });
   },
+  longCommentData(id) {
+    return request({
+      url: `story/${id}/long-comments`,
+      method: "GET",
+    });
+  },
 };
 
 /* 1.Content-Type:application/json ：在axios中传入json数据

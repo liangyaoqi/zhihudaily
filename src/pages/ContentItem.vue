@@ -1,16 +1,25 @@
 <template>
-  <div class="item">
+  <div class="item-box">
     <link rel="stylesheet" :href="itemContent.css" type="text/css" />
-    <van-image class="top-img" cover width="100vw" :src="itemContent.image" />
+    <div class="img-box">
+      <p class="title">{{ itemContent.title }}</p>
+      <div
+        v-if="itemContent.imageHue"
+        class="bag-box"
+        :style="`background-image:linear-gradient(to bottom,transparent,#${itemContent.imageHue.slice(
+          2
+        )},#${itemContent.imageHue.slice(2)})`"
+      ></div>
+      <img width="100vw" :src="itemContent.image" />
+    </div>
     <section class="body" v-html="itemContent.body"></section>
 
     <!-- 底部导航栏 -->
     <div class="footer">
       <ul class="nav">
         <li class="return" @click="back">
-          <van-icon size="25" name="arrow-left" />
+          <van-icon size="20" name="arrow-left" />
         </li>
-        <li class="line"></li>
         <router-link
           :to="{
             path: '/comment',
@@ -19,19 +28,49 @@
             },
           }"
         >
-          <li class="comment">
-            <van-icon size="25" name="comment-o" />
-          </li>
+          <van-badge
+            class="badge-comment"
+            :content="this.extra.comments"
+            color="#fff"
+          >
+            <li class="comment">
+              <van-icon size="25" name="comment-o" />
+            </li>
+          </van-badge>
         </router-link>
-        <li class="good"><van-icon size="25" name="good-job-o" /></li>
-        <li class="collection"><van-icon size="25" name="star-o" /></li>
+        <van-badge
+          class="badge-comment"
+          color="#fff"
+          :content="this.extra.popularity"
+        >
+          <li class="good" @click="likeChange">
+            <van-icon
+              v-if="like"
+              size="25"
+              color="rgb(21, 198, 225)"
+              name="good-job"
+            />
+            <van-icon v-else size="25" name="good-job-o" />
+          </li>
+        </van-badge>
+        <li class="collection" @click="collectionChange">
+          <van-icon
+            size="25"
+            v-if="collection"
+            color="rgb(21, 198, 225)"
+            name="star"
+          />
+          <van-icon size="25" v-else name="star-o" />
+        </li>
         <li class="share"><van-icon size="25" name="share-o" /></li>
       </ul>
+      <div class="line"></div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapMutations, mapState } from "vuex";
 import itemApi from "../api/item";
 
 export default {
@@ -39,74 +78,146 @@ export default {
   props: {},
   data() {
     return {
+      like: false,
+      collection: false,
       itemContent: {},
+      extra: {},
     };
   },
-  computed: {},
-  created() {},
-  mounted() {
-    console.log(this.itemContent);
-    this.getItemData();
+  computed: {
+    ...mapState(["ids"]),
   },
-  watch: {},
+  created() {
+    this.getItemData();
+    this.getExtra();
+    //查看是否收藏过
+    this.ids.map((x) => {
+      if (x == this.$route.query.id) {
+        console.log("collection");
+        this.collection = true;
+      }
+    });
+  },
+  mounted() {},
+  watch: {
+    collection: {
+      handler(newValue) {
+        // 监控是否收藏，取消时将id从ids中剔除
+        if (!newValue) {
+          this.deleteId(this.$route.query.id);
+        }
+      },
+    },
+  },
   methods: {
+    ...mapMutations(["addId", "deleteId"]),
     async getItemData() {
-      console.log(this.$route.query.id);
+      // console.log(this.$route.query.id);
       const id = this.$route.query.id;
       let itemData = await itemApi.itemData(id);
-      console.log(itemData.data.story);
       this.itemContent = itemData.data.story;
+    },
+    async getExtra() {
+      const id = this.$route.query.id;
+      let extraData = await itemApi.extra(id);
+      this.extra = extraData.data;
     },
     back() {
       this.$router.go(-1);
     },
+    likeChange() {
+      this.extra.popularity;
+      this.like = !this.like;
+    },
+    collectionChange() {
+      this.collection = !this.collection;
+      const id = this.$route.query.id;
+      this.addId(id);
+    },
   },
-  components: {},
 };
 </script>
 
-<style scoped lang="css">
+<style scoped lang="less">
 .body {
   margin-top: -30vh;
 }
+.item {
+  margin-top: 5vh;
+}
+.item-box {
+  margin-bottom: 5vh;
+}
 /* 底部导航栏 */
 .footer {
+  padding: 0 !important;
   position: fixed;
-  /* line-height: 7vh; */
-  top: 627px;
-  /* z-index: 999; */
-  background-color: #fff;
+  bottom: 0px;
   width: 100vw;
-  /* height: 7vh; */
-  height: 20px;
+  height: 6vh;
+  background-color: #fff;
 }
 .nav {
-  position: relative;
-  top: -10px;
+  margin: 0 auto;
+  height: 6vh;
   display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  color: black;
+  width: 90vw;
+  margin: 10px auto;
 }
-.return {
+.nav .comment {
   color: black;
 }
-.line {
-  margin-left: 15px;
-  border-left: 1px solid rgb(165, 158, 158);
+// 徽标样式
+/deep/ .van-badge--fixed {
   color: black;
+  left: 19px;
+  top: -2px;
 }
-.comment {
-  margin-left: 20px;
-  color: black;
+/deep/ .van-badge {
+  transform: scale(0.7);
 }
-.good {
-  margin-left: 14vw;
-  color: black;
+.footer .line {
+  position: relative;
+  width: 1vw;
+  height: 3vh;
+  top: -7.5vh;
+  left: 9vh;
+  border-left: 1px solid #ccc;
 }
-.collection {
-  margin-left: 14vw;
-  color: black;
+.nav li:nth-child(2) {
+  margin-left: 30px;
 }
-.share {
-  margin-left: 14vw;
-  color: black;
+.img-box {
+  margin-top: -44vh;
+}
+.img-box img {
+  width: 100vw;
+}
+.img-box .bag-box {
+  width: 100vw;
+  height: 30vh;
+  position: relative;
+  top: 57vh;
+}
+.img-box .title {
+  color: #fff;
+  font-size: 18px;
+  position: relative;
+  top: 83vh;
+  z-index: 10;
+  display: inline-block;
+  width: 87vw;
+  left: 6vw;
+}
+.active {
+  color: blue;
+}
+
+ul,
+ol {
+  padding: 0 !important;
 }
 </style>

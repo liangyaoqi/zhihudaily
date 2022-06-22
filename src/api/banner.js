@@ -1,9 +1,9 @@
 import request from "../utils/request";
 
 export default {
-  bannerData(data) {
+  bannerData() {
     return request({
-      url: `stories/before/${data}`, //接口url
+      url: `stories/latest`, //接口url
       method: "GET", //请求方式get/post
       /* data, //参数
       headers: {

@@ -62,7 +62,14 @@
           />
           <van-icon size="25" v-else name="star-o" />
         </li>
-        <li class="share"><van-icon size="25" name="share-o" /></li>
+        <li class="share">
+          <van-icon size="25" name="share-o" @click="showShare = true" />
+          <van-share-sheet
+            cancel-text=""
+            v-model="showShare"
+            :options="options"
+          />
+        </li>
       </ul>
       <div class="line"></div>
     </div>
@@ -82,6 +89,22 @@ export default {
       collection: false,
       itemContent: {},
       extra: {},
+      //展示弹出层数据
+      showShare: false,
+      options: [
+        [
+          { name: "微信", icon: "wechat" },
+          { name: "朋友圈", icon: "wechat-moments" },
+          { name: "微博", icon: "weibo" },
+          { name: "QQ", icon: "qq" },
+        ],
+        [
+          { name: "复制链接", icon: "link" },
+          { name: "分享海报", icon: "poster" },
+          { name: "二维码", icon: "qrcode" },
+          { name: "小程序码", icon: "weapp-qrcode" },
+        ],
+      ],
     };
   },
   computed: {
@@ -214,6 +237,9 @@ export default {
 }
 .active {
   color: blue;
+}
+/deep/ .van-share-sheet__options {
+  padding: 23px 20px 16px 29px;
 }
 
 ul,

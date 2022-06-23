@@ -37,7 +37,7 @@
         <van-swipe-item v-for="item in banner.stories" :key="item.id">
           <router-link
             :to="{
-              path: '/mainbody/contentitem',
+              path: '/contentitem',
               query: {
                 id: item.id,
               },
@@ -312,7 +312,8 @@ li {
 .topbar .nav .top-title h2 {
   /* position: relative;
         top: 5px; */
-  line-height: 8vh;
+  line-height: 9vh;
+  font-size: 18px;
   margin-left: 20px;
 }
 .topbar .nav .top-img {

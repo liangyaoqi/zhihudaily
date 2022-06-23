@@ -7,6 +7,7 @@ import CommentBody from "../pages/CommentBody";
 import PersonalCenter from "../pages/PersonalCenter";
 import Collection from "../pages/Collection";
 import Message from "../pages/Message";
+import Setting from "../pages/Setting";
 
 Vue.use(VueRouter);
 
@@ -47,6 +48,11 @@ const router = new VueRouter({
       name: "message",
       path: "/message",
       component: Message,
+    },
+    {
+      name: "setting",
+      path: "/setting",
+      component: Setting,
     },
   ],
 });

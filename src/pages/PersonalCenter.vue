@@ -16,7 +16,7 @@
             >夜间模式</span
           >
         </li>
-        <li>
+        <li @click="toSetting">
           <img class="setting" src="../assets/setting.png" alt="" /><span
             >设置</span
           >
@@ -41,6 +41,9 @@ export default {
     },
     back() {
       this.$router.go(-1);
+    },
+    toSetting() {
+      this.$router.push("/setting");
     },
   },
 };
